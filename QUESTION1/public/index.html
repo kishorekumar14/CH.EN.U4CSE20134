@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Number Management Frontend</title>
+</head>
+<body>
+  <h1>Number Management Service</h1>
+  <button id="fetchNumbers">Fetch Numbers</button>
+  <div id="numbersList"></div>
+
+  <script>
+    const fetchButton = document.getElementById("fetchNumbers");
+    const numbersList = document.getElementById("numbersList");
+
+    fetchButton.addEventListener("click", async () => {
+      try {
+        const response = await fetch('http://localhost:8081/numbers?url=http://20.244.56.144/numbers/primes&url=http://20.244.56.144/numbers/fibo&url=http://20.244.56.144/numbers/odd');
+        const data = await response.json();
+
+        if (response.ok) {
+          const mergedData = data.data;
+          const mergedNumbers = [];
+
+          mergedData.forEach(dataItem => {
+            if (Array.isArray(dataItem.numbers)) {
+              mergedNumbers.push(...dataItem.numbers);
+            }
+          });
+
+          const uniqueNumbers = Array.from(new Set(mergedNumbers));
+          const sortedNumbers = uniqueNumbers.sort((a, b) => a - b);
+
+          numbersList.innerHTML = `<p>Numbers: [ ${sortedNumbers.join(', ')} ]</p>`;
+        } else {
+          numbersList.innerHTML = "<p>Error fetching data.</p>";
+        }
+      } catch (error) {
+        numbersList.innerHTML = "<p>An error occurred.</p>";
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
